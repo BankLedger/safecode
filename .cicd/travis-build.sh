@@ -2,6 +2,7 @@
 set -e
 
 function determine-hash() {
+    # Determine the sha1 hash of all dockerfiles in the .cicd directory.
     [[ -z $1 ]] && echo "Please provide the files to be hashed (wildcards supported)" && exit 1
     echo "Obtaining Hash of files from $1..."
     # Collect all files, hash them, then hash those.
@@ -28,12 +29,15 @@ function build() {
 }
 
 function generate_docker_image() {
-    
+    # If we cannot pull the image, we build and push it first.
+    echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+    cd ./.cicd
+    docker build -t eosio/producer:ci-${IMAGE_TAG}-${DETERMINED_HASH} -f ./${IMAGE_TAG}.dockerfile .
+    docker push eosio/producer:ci-${IMAGE_TAG}-${DETERMINED_HASH}
 }
 
 determine-hash ".cicd/*.dockerfile"
 [[ -z $DETERMINED_HASH ]] && echo "DETERMINED_HASH empty! (check determine-hash function)" && exit 1
-IMAGE_TAG="${IMAGE_TAG}-$DETERMINED_HASH"
 CPU_CORES=$(getconf _NPROCESSORS_ONLN)
 
 # Dockerfile checks.
@@ -53,9 +57,9 @@ if [[ "$(uname)" == Darwin ]]; then
     ctest -j$(getconf _NPROCESSORS_ONLN) -LE _tests --output-on-failure -T Test
 else # linux
     echo 'Detected Linux, building in Docker.'
-    echo "Looking for $IMAGE_TAG"
-    echo "$ docker pull eosio/producer:ci-${IMAGE_TAG}"
-    if docker pull eosio/producer:ci-${IMAGE_TAG}; then
+    echo "Looking for $IMAGE_TAG-$DETERMINED_HASH"
+    echo "$ docker pull eosio/producer:ci-${IMAGE_TAG}-${DETERMINED_HASH}"
+    if docker pull eosio/producer:ci-${IMAGE_TAG}-${DETERMINED_HASH}; then
         build
     else
         generate_docker_image
