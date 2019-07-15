@@ -36,7 +36,7 @@ function generate_docker_image() {
     docker push eosio/producer:ci-${IMAGE_TAG}-${DETERMINED_HASH}
 }
 
-determine-hash ".cicd/*.dockerfile"
+determine-hash ".cicd/${IMAGE_TAG}.dockerfile"
 [[ -z $DETERMINED_HASH ]] && echo "DETERMINED_HASH empty! (check determine-hash function)" && exit 1
 CPU_CORES=$(getconf _NPROCESSORS_ONLN)
 
