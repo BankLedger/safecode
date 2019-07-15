@@ -74,7 +74,7 @@ RUN curl -L https://github.com/mongodb/mongo-cxx-driver/archive/r3.4.0.tar.gz -o
 
 ENV PATH=${PATH}:/mongodb-linux-x86_64-ubuntu1604-3.6.3/bin
 
-# Build appropriate version of ccache.
+# Build appropriate version of CCache because apt installs an incompatible version on U16.
 RUN curl -LO https://github.com/ccache/ccache/releases/download/v3.4.1/ccache-3.4.1.tar.gz \
   && tar -xzf ccache-3.4.1.tar.gz \
   && cd ccache-3.4.1 \
