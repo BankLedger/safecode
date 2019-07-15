@@ -8,11 +8,14 @@ function determine-hash() {
     HASHES=()
     for FILE in $(find $1 -type f); do
         HASH=$(sha1sum $FILE | sha1sum | awk '{ print $1 }')
-        HASHES=($HASH $HASHES)
+        HASHES=($HASH "${HASHES[*]}")
         echo "$FILE - $HASH"
     done
-    export DETERMINED_HASH=$(echo $HASHES | sha1sum | awk '{ print $1 }')
+    export DETERMINED_HASH=$(echo ${HASHES[*]} | sha1sum | awk '{ print $1 }')
 }
+
+determine-hash ".cicd/*.dockerfile"
+[[ -z $DETERMINED_HASH ]] && echo "DETERMINED_HASH empty! (check determine-hash function)" && exit 1
 
 CPU_CORES=$(getconf _NPROCESSORS_ONLN)
 if [[ "$(uname)" == Darwin ]]; then
@@ -45,4 +48,3 @@ else # linux
         $PRE_COMMANDS ccache -s && \
         mkdir /eos/build && cd /eos/build && $EXPORTS cmake -DCMAKE_BUILD_TYPE='Release' -DCORE_SYMBOL_NAME='SYS' -DOPENSSL_ROOT_DIR='/usr/include/openssl' -DBUILD_MONGO_DB_PLUGIN=true $CMAKE_EXTRAS /eos && make -j $(getconf _NPROCESSORS_ONLN) 
         ctest -j$(getconf _NPROCESSORS_ONLN) -LE _tests --output-on-failure -T Test"
-fi
