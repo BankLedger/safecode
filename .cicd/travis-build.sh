@@ -1,5 +1,19 @@
 #!/bin/bash
 set -e
+
+function determine-hash() {
+    [[ -z $1 ]] && echo "Please provide the files to be hashed (wildcards supported)" && exit 1
+    echo "Obtaining Hash of files from $1..."
+    # Collect all files, hash them, then hash those.
+    HASHES=()
+    for FILE in $(find $1 -type f); do
+        HASH=$(sha1sum $FILE | sha1sum | awk '{ print $1 }')
+        HASHES=($HASH $HASHES)
+        echo "$FILE - $HASH"
+    done
+    export DETERMINED_HASH=$(echo $HASHES | sha1sum | awk '{ print $1 }')
+}
+
 CPU_CORES=$(getconf _NPROCESSORS_ONLN)
 if [[ "$(uname)" == Darwin ]]; then
     ccache -s
