@@ -80,3 +80,6 @@ export COUNT=0
 export DRYRUN=${DRYRUN:-false}
 export VERBOSE=${VERBOSE:-false}
 export SUDO_LOCATION=$( command -v sudo )
+
+# MISC
+export BUILD_DEPENDENCIES_ONLY=${BUILD_DEPENDENCIES_ONLY:-false}
