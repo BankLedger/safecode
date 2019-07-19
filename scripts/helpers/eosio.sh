@@ -224,7 +224,7 @@ function ensure-cmake() {
     echo "${COLOR_CYAN}[Ensuring CMAKE installation]${COLOR_NC}"
     if [[ ! -e "${CMAKE}" ]]; then
 		execute bash -c "cd $SRC_DIR && \
-        curl -LO https://cmake.org/files/v${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}/cmake-${CMAKE_VERSION}.tar.gz \
+        curl -C - -LO https://cmake.org/files/v${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}/cmake-${CMAKE_VERSION}.tar.gz \
         && tar -xzf cmake-${CMAKE_VERSION}.tar.gz \
         && cd cmake-${CMAKE_VERSION} \
         && ./bootstrap --prefix=${EOSIO_INSTALL_DIR} \
@@ -253,7 +253,7 @@ function ensure-boost() {
             BOOTSTRAP_FLAGS="--with-toolset=clang"
         fi
 		execute bash -c "cd $SRC_DIR && \
-        curl -LO https://dl.bintray.com/boostorg/release/$BOOST_VERSION_MAJOR.$BOOST_VERSION_MINOR.$BOOST_VERSION_PATCH/source/boost_$BOOST_VERSION.tar.bz2 \
+        curl -C - -LO https://dl.bintray.com/boostorg/release/$BOOST_VERSION_MAJOR.$BOOST_VERSION_MINOR.$BOOST_VERSION_PATCH/source/boost_$BOOST_VERSION.tar.bz2 \
         && tar -xjf boost_$BOOST_VERSION.tar.bz2 \
         && cd $BOOST_ROOT \
         && ./bootstrap.sh ${BOOTSTRAP_FLAGS} --prefix=$BOOST_ROOT \
